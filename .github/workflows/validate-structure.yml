@@ -1,0 +1,59 @@
+name: Validate Repository Structure
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  validate-structure:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Check if /docs folder exists
+        id: check_docs_folder
+        run: |
+          if [ -d "docs" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "✓ /docs folder exists"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "✗ /docs folder does not exist"
+            exit 1
+          fi
+      
+      - name: Count files in /docs folder
+        id: count_docs_files
+        if: steps.check_docs_folder.outputs.exists == 'true'
+        run: |
+          file_count=$(find docs -type f ! -name '.*' | wc -l)
+          echo "file_count=$file_count" >> $GITHUB_OUTPUT
+          echo "Found $file_count files in /docs folder"
+          
+          if [ "$file_count" -lt 3 ]; then
+            echo "✗ /docs folder contains less than 3 files (found: $file_count)"
+            exit 1
+          else
+            echo "✓ /docs folder contains at least 3 files"
+          fi
+      
+      - name: List files in /docs folder
+        if: steps.check_docs_folder.outputs.exists == 'true'
+        run: |
+          echo "Files in /docs folder:"
+          find docs -type f ! -name '.*' -exec ls -lh {} \;
+      
+      - name: Validation Summary
+        if: always()
+        run: |
+          echo "## Repository Structure Validation" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Results:" >> $GITHUB_STEP_SUMMARY
+          echo "- **Docs Folder**: ${{ steps.check_docs_folder.outputs.exists }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.check_docs_folder.outputs.exists }}" = "true" ]; then
+            echo "- **File Count**: ${{ steps.count_docs_files.outputs.file_count }} files" >> $GITHUB_STEP_SUMMARY
+          fi
