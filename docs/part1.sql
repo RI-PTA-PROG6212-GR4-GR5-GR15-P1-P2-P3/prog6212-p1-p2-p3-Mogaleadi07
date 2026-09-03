@@ -45,3 +45,14 @@ createdDate DATETIME DEFAULT GETDATE(),
 FOREIGN KEY (eventID) REFERENCES Event(eventID) ON DELETE CASCADE,
  CHECK (ageGroup IS NOT NULL OR distanceType IS NOT NULL)
 );
+
+CREATE TABLE Route (
+    routeID INT PRIMARY KEY IDENTITY(1,1),
+    eventID INT NOT NULL UNIQUE,
+    routeDescription NVARCHAR(MAX),
+    distance DECIMAL(10, 2) NOT NULL,
+    difficulty NVARCHAR(50),
+    mapURL NVARCHAR(MAX),
+    createdDate DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (eventID) REFERENCES Event(eventID) ON DELETE CASCADE
+);
