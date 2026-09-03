@@ -34,3 +34,14 @@ eventType NVARCHAR(50) NOT NULL CHECK (eventType IN ('Walk', 'Run', 'Cycle')),
 createdDate DATETIME DEFAULT GETDATE(),
 FOREIGN KEY (organiserID) REFERENCES EventOrganiser(organiserID) ON DELETE CASCADE
 );
+
+CREATE TABLE EventCategories (
+categoryID INT PRIMARY KEY IDENTITY(1,1),
+eventID INT NOT NULL,
+categoryName NVARCHAR(100) NOT NULL,
+ageGroup NVARCHAR(50),
+distanceType NVARCHAR(50),
+createdDate DATETIME DEFAULT GETDATE(),
+FOREIGN KEY (eventID) REFERENCES Event(eventID) ON DELETE CASCADE,
+ CHECK (ageGroup IS NOT NULL OR distanceType IS NOT NULL)
+);
