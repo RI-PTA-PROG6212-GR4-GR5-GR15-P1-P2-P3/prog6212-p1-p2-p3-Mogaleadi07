@@ -56,3 +56,16 @@ CREATE TABLE Route (
     createdDate DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (eventID) REFERENCES Event(eventID) ON DELETE CASCADE
 );
+
+CREATE TABLE EventEnrolment (
+    enrolmentID INT PRIMARY KEY IDENTITY(1,1),
+    participantID INT NOT NULL,
+    eventID INT NOT NULL,
+    categoryID INT NOT NULL,
+    enrolmentDate DATETIME DEFAULT GETDATE(),
+    status NVARCHAR(50) NOT NULL DEFAULT 'Confirmed' CHECK (status IN ('Confirmed', 'Withdrawn')),
+    FOREIGN KEY (participantID) REFERENCES Participant(participantID) ,
+    FOREIGN KEY (eventID) REFERENCES Event(eventID) ,
+    FOREIGN KEY (categoryID) REFERENCES EventCategories(categoryID) ON DELETE CASCADE,
+    UNIQUE (participantID, eventID, categoryID)
+);
