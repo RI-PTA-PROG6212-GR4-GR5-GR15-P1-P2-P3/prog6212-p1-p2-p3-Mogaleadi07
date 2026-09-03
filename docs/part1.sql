@@ -21,3 +21,16 @@ participantID INT PRIMARY KEY,
 userID INT NOT NULL UNIQUE,
 FOREIGN KEY (userID) REFERENCES [User](userId) ON DELETE CASCADE
 );
+
+CREATE TABLE Event (
+ eventID INT PRIMARY KEY IDENTITY(1,1),
+ organiserID INT NOT NULL,
+ eventName NVARCHAR(255) NOT NULL,
+ description NVARCHAR(250),
+location NVARCHAR(255) NOT NULL,
+eventDate DATETIME NOT NULL,
+distance DECIMAL(10, 2) NOT NULL CHECK (distance > 0),
+eventType NVARCHAR(50) NOT NULL CHECK (eventType IN ('Walk', 'Run', 'Cycle')),
+createdDate DATETIME DEFAULT GETDATE(),
+FOREIGN KEY (organiserID) REFERENCES EventOrganiser(organiserID) ON DELETE CASCADE
+);
