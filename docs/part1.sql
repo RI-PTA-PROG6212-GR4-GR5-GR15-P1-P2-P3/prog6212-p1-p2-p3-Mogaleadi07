@@ -7,3 +7,10 @@ contactNumber NVARCHAR(20) NOT NULL,
 passwordHash NVARCHAR(255) NOT NULL,
 createdDate DATETIME DEFAULT GETDATE()
 );
+
+
+CREATE TABLE EventOrganiser (
+    organiserID INT PRIMARY KEY,
+    userID INT NOT NULL UNIQUE,
+    FOREIGN KEY (userID) REFERENCES [User](userId) ON DELETE CASCADE
+);
