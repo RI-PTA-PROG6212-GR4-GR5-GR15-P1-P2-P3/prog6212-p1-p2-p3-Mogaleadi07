@@ -69,3 +69,12 @@ CREATE TABLE EventEnrolment (
     FOREIGN KEY (categoryID) REFERENCES EventCategories(categoryID) ON DELETE CASCADE,
     UNIQUE (participantID, eventID, categoryID)
 );
+
+CREATE TABLE Results (
+    resultID INT PRIMARY KEY IDENTITY(1,1),
+    enrolmentID INT NOT NULL UNIQUE,
+    finishTime TIME NOT NULL,
+    position INT NOT NULL CHECK (position > 0),
+    dateOfResults DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (enrolmentID) REFERENCES EventEnrolment(enrolmentID) ON DELETE CASCADE
+);
