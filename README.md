@@ -2,8 +2,16 @@
 
 ## Project Overview
 
-RaceDay is a full-stack web-based event management system designed for South African road running, walking, and cycling events. The system enables event organisers to create and manage races, define participant categories, and record race results. Participants can browse available events, enrol in races, and track their performance history.
-The RaceDay event management system  streamlines the complete event lifecycle — from event creation through result recording — with role-based access control and real-time data management.
+RaceDay is a full-stack event management system purpose-built for South 
+African road running, walking, and cycling events. It addresses the complete 
+event lifecycle: organisers can create events of any size, define category 
+divisions for different participant groups, manage enrolments, and record 
+race results with participant positions and finish times. Participants 
+benefit from a centralized platform to discover upcoming events, view event 
+details and routes, enrol in their chosen category, and maintain a personal 
+race history. The system enforces data integrity through role-based access 
+control, ensuring event organisers cannot accidentally compete in their own 
+races and participants cannot register twice for the same category.
 
 ## User Roles
 
@@ -11,7 +19,7 @@ The RaceDay event management system  streamlines the complete event lifecycle �
 
 Who: A user responsible for creating and managing road events.
 
-The tasks the event organiser can do:
+The tasks the event organiser should do:
 - Create new events (races, walks, cycles)
 - Define event categories (age groups, distance types)
 - View all participants enrolled in their events
@@ -41,16 +49,45 @@ Example: David Nkosi views all upcoming marathons, enrolls in the Comrades 87km 
 ## Database Schema for Section A:
 
 8 Entities:
-- USER: Base user information
-- EVENT_ORGANISER: Organiser-specific role
-- PARTICIPANT: Participant-specific role
-- EVENT: Race events
-- EVENT_CATEGORIES: Event divisions (age/distance)
-- EVENT_ENROLMENT: Participant sign-ups (3-way junction)
-- ROUTE: Race route information
-- RESULTS: Finish times and positions
 
-Key Relationships:
+USER
+  Base user account with authentication credentials and role assignment 
+  (EventOrganiser or Participant). Central table linking all other entities.
+
+EVENT_ORGANISER
+  Users authorized to create and manage events. Linked to USER table to 
+  maintain role separation and enable organiser-specific functionality.
+
+PARTICIPANT
+  Users competing in events. Linked to USER table and tracks all event 
+  enrolments, categories, and race results across multiple events.
+
+EVENT
+  Race event details (name, location, date, distance, type). Created by 
+  organisers and contains multiple categories, one route, and many enrolments.
+
+EVENT_CATEGORIES
+  Event divisions for grouping participants (age groups, distance types). 
+  One event can have multiple categories to serve different participant groups.
+
+EVENT_ENROLMENT
+  Links participants to event categories. Tracks signup date and status. 
+  Unique constraint prevents duplicate enrolments for same participant, 
+  event, and category.
+
+ROUTE
+  Event-specific route information (description, distance, difficulty, 
+  map URL). One-to-one relationship with events. Enables participant 
+  preparation and logistics planning.
+
+RESULTS
+  Race outcome records (finish time, position, date). Linked to enrolments 
+  with 0..1 cardinality to support DNF (Did Not Finish) scenarios.
+  
+---
+
+## Key Relationships
+
 - 1 User can be 1 EventOrganiser OR 1 Participant
 - 1 EventOrganiser creates multiple Events
 - 1 Event has 1 Route
@@ -62,20 +99,24 @@ Key Relationships:
 
 18 total endpoints across 7 functional areas:
 
-Authentication         2    
-User Profile           3     
-Events                 5     
-Categories             2     
-Enrolments             3     
-Results                2   
-Route                  1    
+|Authentication |   2  |  
+|User Profile   |   3  |   
+|Events         |   5  |   
+|Categories     |   2  |   
+|Enrolments     |   3  |   
+|Results        |   2  | 
+|Route          |   1  |  
 
 ## CI/CD Pipeline
+CI/CD Pipeline Screenshot:
 
-Our continuous integration and deployment workflow ensures code quality and reliable releases.
-CI/CD Pipeline Screenshot is in the docs folder
+<img width="1366" height="768" alt="Screenshot 2026-09-04 094638" src="https://github.com/user-attachments/assets/743c3192-f294-49a7-b2f9-47859f014d9d" />
 
 ---
+## The Video Walkthrough
+
+The Video Walkthrough explains the planning documents from the entity relationship diagrams (ERDs),
+API Endpoints and the SQL Scripts in the SQL Server Management System (SSMS).
 
 YouTube Link for the unlisted video : 
 
