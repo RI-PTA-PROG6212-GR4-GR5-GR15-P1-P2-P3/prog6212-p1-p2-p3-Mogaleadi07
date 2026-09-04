@@ -73,8 +73,8 @@ Route                  1
 ## CI/CD Pipeline
 
 Our continuous integration and deployment workflow ensures code quality and reliable releases.
-
 CI/CD Pipeline Screenshot is in the docs folder
+
 ---
 
 YouTube Link for the unlisted video : 
