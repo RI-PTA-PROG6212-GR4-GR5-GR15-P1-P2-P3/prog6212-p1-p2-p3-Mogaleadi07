@@ -74,7 +74,8 @@ Route                  1
 
 Our continuous integration and deployment workflow ensures code quality and reliable releases.
 
-CI/CD Pipeline Screenshot: 
+CI/CD Pipeline Screenshot Path:
+![CI/CD Pipeline](./images/cicd-pipeline.png)
 
 YouTube Link for the unlisted video : 
 
