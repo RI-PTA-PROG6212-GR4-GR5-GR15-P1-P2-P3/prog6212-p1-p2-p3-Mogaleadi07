@@ -61,6 +61,7 @@ Key Relationships:
 ## API Endpoints
 
 18 total endpoints across 7 functional areas:
+
 Authentication         2    
 User Profile           3     
 Events                 5     
