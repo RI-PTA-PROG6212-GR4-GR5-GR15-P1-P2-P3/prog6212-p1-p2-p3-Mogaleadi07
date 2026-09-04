@@ -118,5 +118,5 @@ CI/CD Pipeline Screenshot:
 The Video Walkthrough explains the planning documents from the entity relationship diagrams (ERDs),
 API Endpoints and the SQL Scripts in the SQL Server Management System (SSMS).
 
-YouTube Link for the unlisted video : 
+YouTube Link for the unlisted video : https://youtu.be/m_7JQy6tCgQ 
 
