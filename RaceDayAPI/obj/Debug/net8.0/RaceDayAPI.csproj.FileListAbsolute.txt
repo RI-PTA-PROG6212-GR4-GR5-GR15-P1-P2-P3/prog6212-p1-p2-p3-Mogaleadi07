@@ -139,3 +139,4 @@ C:\Users\Lesedi\source\repos\RaceDayAPI\RaceDayAPI\obj\Debug\net8.0\RaceDayAPI.p
 C:\Users\Lesedi\source\repos\RaceDayAPI\RaceDayAPI\obj\Debug\net8.0\RaceDayAPI.genruntimeconfig.cache
 C:\Users\Lesedi\source\repos\RaceDayAPI\RaceDayAPI\obj\Debug\net8.0\ref\RaceDayAPI.dll
 C:\Users\Lesedi\source\repos\RaceDayAPI\RaceDayAPI\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+C:\Users\Lesedi\source\repos\RaceDayAPI\RaceDayAPI\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
