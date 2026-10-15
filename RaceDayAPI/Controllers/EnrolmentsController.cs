@@ -46,6 +46,7 @@ namespace RaceDayAPI.Controllers
                 ParticipantID = participant.ParticipantID,
                 EventID = dto.EventID,
                 CategoryID = dto.CategoryID,
+                EnrolmentDate = DateTime.Now,
                 Status = "Confirmed"
             };
             _db.EventEnrolments.Add(enrolment);

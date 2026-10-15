@@ -59,7 +59,8 @@ namespace RaceDayAPI.Controllers
                 Location = dto.Location,
                 EventDate = dto.EventDate,
                 Distance = dto.Distance,
-                EventType = dto.EventType
+                EventType = dto.EventType,
+                CreatedDate = DateTime.Now
             };
             _db.Events.Add(ev);
             _db.SaveChanges();

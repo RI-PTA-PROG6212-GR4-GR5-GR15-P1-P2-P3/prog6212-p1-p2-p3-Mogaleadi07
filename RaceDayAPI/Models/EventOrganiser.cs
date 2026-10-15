@@ -1,8 +1,11 @@
-﻿namespace RaceDayAPI.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace RaceDayAPI.Models
 {
     public class EventOrganiser
     {
         // automatic properties
+        [Key]
         public int OrganiserID { get; set; }
         public int UserID { get; set; }
 

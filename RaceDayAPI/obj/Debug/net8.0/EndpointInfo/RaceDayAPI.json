@@ -556,31 +556,16 @@
       },
       "LoginDto": {
         "required": [
-          "contactNumber",
           "emailAddress",
-          "password",
-          "role",
-          "userName"
+          "password"
         ],
         "type": "object",
         "properties": {
-          "userName": {
-            "type": "string",
-            "nullable": true
-          },
           "emailAddress": {
             "type": "string",
             "nullable": true
           },
-          "contactNumber": {
-            "type": "string",
-            "nullable": true
-          },
           "password": {
-            "type": "string",
-            "nullable": true
-          },
-          "role": {
             "type": "string",
             "nullable": true
           }

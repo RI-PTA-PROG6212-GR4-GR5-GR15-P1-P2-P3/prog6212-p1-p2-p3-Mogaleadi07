@@ -37,7 +37,8 @@ namespace RaceDayAPI.Controllers
                     UserName = dto.UserName,
                     EmailAddress = dto.EmailAddress,
                     ContactNumber = dto.ContactNumber,
-                    PasswordHash = PasswordService.Hash(dto.Password)
+                    PasswordHash = PasswordService.Hash(dto.Password),
+                    CreatedDate = DateTime.Now
                 };
 
                 _db.Users.Add(user);

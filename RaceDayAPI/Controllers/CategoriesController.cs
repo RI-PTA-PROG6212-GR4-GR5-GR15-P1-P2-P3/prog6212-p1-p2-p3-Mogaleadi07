@@ -51,7 +51,8 @@ namespace RaceDayAPI.Controllers
                 EventID = eventId,
                 CategoryName = dto.CategoryName,
                 AgeGroup = dto.AgeGroup,
-                DistanceType = dto.DistanceType
+                DistanceType = dto.DistanceType,
+                CreatedDate = DateTime.Now
             };
             _db.EventCategories.Add(category);
             _db.SaveChanges();

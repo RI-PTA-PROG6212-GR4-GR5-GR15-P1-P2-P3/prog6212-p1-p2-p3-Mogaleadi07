@@ -42,7 +42,8 @@ namespace RaceDayAPI.Controllers
             {
                 EnrolmentID = dto.EnrolmentID,
                 FinishTime = dto.FinishTime,
-                Position = dto.Position
+                Position = dto.Position,
+                DateOfResults = DateTime.Now
             };
             _db.Results.Add(result);
             _db.SaveChanges();
