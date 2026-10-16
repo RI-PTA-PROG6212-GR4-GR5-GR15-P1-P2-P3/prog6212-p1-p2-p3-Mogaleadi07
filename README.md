@@ -15,9 +15,10 @@ races and participants cannot register twice for the same category.
 
 This repository contains both Part 1 (planning, ERD, SQL schema) and Part 2 (the working ASP.NET Core Web API) integrated into a single deliverable.
 
-===============================================
+---
+
 TABLE OF CONTENTS
-===============================================
+
 
 1.User Roles
 
@@ -132,10 +133,12 @@ RESULTS
 |Enrolments     |   3  |   
 |Results        |   2  | 
 |Route          |   1  |  
----
-##SETUP AND RUN INSTRUCTIONS
 
-###PREREQUISITES
+---
+
+## SETUP AND RUN INSTRUCTIONS
+
+PREREQUISITES:
 
 Make sure you have the following installed:
 
@@ -229,7 +232,7 @@ Press F5 (or the green Run button) in Visual Studio.
 Swagger opens automatically in your browser at https://localhost:<port>/swagger.
 
 
-##AUTHENTICATION AND ROLE-BASED ACCESS
+## AUTHENTICATION AND ROLE-BASED ACCESS
 
 HOW AUTHENTICATION WORKS
 
