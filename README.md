@@ -260,7 +260,10 @@ CI/CD Pipeline Screenshot Part 1:
 
 <img width="1366" height="768" alt="Screenshot 2026-09-04 094638" src="https://github.com/user-attachments/assets/743c3192-f294-49a7-b2f9-47859f014d9d" />
 
+
 CI/CD Pipeline Screenshot Part 2:
+<img width="706" height="188" alt="RaceDayAPI CI Screenshot" src="https://github.com/user-attachments/assets/95724a55-5fec-4f3f-a75e-24ad2f78c8b5" />
+
 
 ---
 ## The Video Walkthrough
