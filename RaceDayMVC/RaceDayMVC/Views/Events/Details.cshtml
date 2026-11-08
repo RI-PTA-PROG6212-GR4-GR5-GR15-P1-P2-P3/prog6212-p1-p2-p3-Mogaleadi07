@@ -1,0 +1,66 @@
+﻿@model RaceDayMVC.Models.DTOs.EventDetailDto
+@{
+    ViewData["Title"] = Model.EventName;
+}
+
+<div class="row mt-4">
+    <div class="col-md-8">
+        <h1 class="fw-bold text-primary">@Model.EventName</h1>
+        <h5 class="text-muted">📍 @Model.Location</h5>
+        <hr />
+        <p>@Model.Description</p>
+
+        <div class="alert alert-info mt-4 border-0 shadow-sm">
+            <strong>Date:</strong> @Model.EventDate.ToString("dd MMM yyyy") <br />
+            <strong>Distance:</strong> @Model.Distance km <br />
+            <strong>Type:</strong> @Model.EventType <br />
+            <strong>Organiser:</strong> @Model.OrganiserName
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-dark text-white fw-bold py-3">
+                Available Categories
+            </div>
+            <div class="card-body">
+                @if (Context.Session.GetString("UserRole") == "Participant")
+                {
+                    @if (Model.Categories != null && Model.Categories.Any())
+                    {
+                        <form asp-controller="Participant" asp-action="Enrol" method="post">
+                            <input type="hidden" name="eventId" value="@Model.EventID" />
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Select a Category:</label>
+                                <select name="categoryId" class="form-select" required>
+                                    <option value="">-- Choose Category --</option>
+                                    @foreach (var cat in Model.Categories)
+                                    {
+                                        <option value="@cat.CategoryID">@cat.CategoryName (@cat.DistanceType)</option>
+                                    }
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100 fw-bold py-2">Enrol Now</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning mb-0">No categories available yet.</div>
+                    }
+                }
+                else if (Context.Session.GetString("JwtToken") == null)
+                {
+                    <div class="alert alert-info mb-0">
+                        Please <a asp-controller="Account" asp-action="Login" class="fw-bold">Login</a> as a Participant to enrol.
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-secondary mb-0">
+                        Organisers cannot enrol in events.
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

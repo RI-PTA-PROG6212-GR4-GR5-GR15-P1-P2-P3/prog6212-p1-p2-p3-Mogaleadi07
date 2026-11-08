@@ -1,0 +1,59 @@
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using RaceDayMVC.Services;
+
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddControllersWithViews();
+
+
+// 1. Add MVC
+builder.Services.AddControllersWithViews();
+
+// 2. Enable Session (Required for Auth state)
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(60); // Session expires after 60 mins of inactivity
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+//  Registering the  HttpClient for the API
+var apiBaseURL = builder.Configuration["ApiSettings: BaseUrl"] ?? "https://localhost:7054/";
+builder.Services.AddHttpClient("RaceDayApi", client =>
+{
+    client.BaseAddress = new Uri(apiBaseURL!); 
+});
+// registering the httpcontextaccessor and api client
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ApiClient();
+
+
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+app.UseSession(); // Enable session middleware
+
+app.UseAuthorization();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.Run();

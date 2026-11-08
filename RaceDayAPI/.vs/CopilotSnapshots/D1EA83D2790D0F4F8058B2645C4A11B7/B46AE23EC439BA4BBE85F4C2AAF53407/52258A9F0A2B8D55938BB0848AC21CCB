@@ -1,0 +1,377 @@
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Moq;
+using RaceDayAPI.Controllers;
+using RaceDayAPI.Data;
+using RaceDayAPI.Models;
+using RaceDayAPI.Models.DTOs;
+using System.Security.Claims;
+using Xunit;
+
+namespace RaceDayAPI.Tests.Controllers
+{
+    public class EventsControllerTests
+    {
+        private AppDbContext GetDbContext()
+        {
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                .Options;
+
+            return new AppDbContext(options);
+        }
+
+        private EventsController CreateController(AppDbContext db, int userId)
+        {
+            var controller = new EventsController(db);
+
+            // Mock the User claims
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString())
+            };
+            var identity = new ClaimsIdentity(claims);
+            var principal = new ClaimsPrincipal(identity);
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = principal }
+            };
+
+            return controller;
+        }
+
+        [Fact]
+        public void GetAll_ReturnsOkResult_WithEventsList()
+        {
+            // Arrange
+            var db = GetDbContext();
+            var controller = CreateController(db, 1);
+
+            // Add test data
+            var organiser = new EventOrganiser { OrganiserID = 1, UserID = 1, User = new User() };
+            db.EventOrganisers.Add(organiser);
+
+            var events = new List<Event>
+            {
+                new Event { EventID = 1, OrganiserID = 1, EventName = "Marathon", Location = "City", EventDate = DateTime.Now, Distance = 42.2m, EventType = "Run", CreatedDate = DateTime.Now },
+                new Event { EventID = 2, OrganiserID = 1, EventName = "Cycling Tour", Location = "Country", EventDate = DateTime.Now, Distance = 100m, EventType = "Cycle", CreatedDate = DateTime.Now }
+            };
+            db.Events.AddRange(events);
+            db.SaveChanges();
+
+            // Act
+            var result = controller.GetAll();
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var returnedEvents = Assert.IsType<List<Event>>(okResult.Value);
+            Assert.Equal(2, returnedEvents.Count);
+        }
+
+        [Fact]
+        public void GetById_WithValidId_ReturnsOkResult_WithEvent()
+        {
+            // Arrange
+            var db = GetDbContext();
+            var controller = CreateController(db, 1);
+
+            var organiser = new EventOrganiser { OrganiserID = 1, UserID = 1, User = new User() };
+            db.EventOrganisers.Add(organiser);
+
+            var eventToAdd = new Event
+            {
+                EventID = 1,
+                OrganiserID = 1,
+                EventName = "Test Event",
+                Location = "Test Location",
+                EventDate = DateTime.Now,
+                Distance = 5.0m,
+                EventType = "Walk",
+                CreatedDate = DateTime.Now
+            };
+            db.Events.Add(eventToAdd);
+            db.SaveChanges();
+
+            // Act
+            var result = controller.GetById(1);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var returnedEvent = Assert.IsType<Event>(okResult.Value);
+            Assert.Equal(1, returnedEvent.EventID);
+            Assert.Equal("Test Event", returnedEvent.EventName);
+        }
+
+        [Fact]
+        public void GetById_WithInvalidId_ReturnsNotFound()
+        {
+            // Arrange
+            var db = GetDbContext();
+            var controller = CreateController(db, 1);
+
+            // Act
+            var result = controller.GetById(999);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public void AddEvent_WithValidData_ReturnsOkResult_AndSavesToDatabase()
+        {
+            // Arrange
+            var db = GetDbContext();
+            var controller = CreateController(db, 1);
+
+            var organiser = new EventOrganiser { OrganiserID = 1, UserID = 1, User = new User() };
+            db.EventOrganisers.Add(organiser);
+            db.SaveChanges();
+
+            var addEventDto = new AddEventDto
+            {
+                EventName = "New Marathon",
+                Description = "A fun marathon",
+                Location = "Downtown",
+                EventDate = DateTime.Now.AddDays(30),
+                Distance = 42.2m,
+                EventType = "Run"
+            };
+
+            // Act
+            var result = controller.AddEvent(addEventDto);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var createdEvent = Assert.IsType<Event>(okResult.Value);
+            Assert.Equal("New Marathon", createdEvent.EventName);
+            Assert.Equal(1, createdEvent.OrganiserID);
+
+            // Verify saved to database
+            var eventFromDb = db.Events.FirstOrDefault(e => e.EventID == createdEvent.EventID);
+            Assert.NotNull(eventFromDb);
+            Assert.Equal("New Marathon", eventFromDb.EventName);
+        }
+
+        [Fact]
+        public void AddEvent_WithoutOrganiserRole_ReturnsForbid()
+        {
+            // Arrange
+            var db = GetDbContext();
+            var controller = CreateController(db, 1);
+            // No organiser entry, so user is not an organiser
+
+            var addEventDto = new AddEventDto
+            {
+                EventName = "Unauthorized Event",
+                Location = "Somewhere",
+                EventDate = DateTime.Now,
+                Distance = 10.0m,
+                EventType = "Walk"
+            };
+
+            // Act
+            var result = controller.AddEvent(addEventDto);
+
+            // Assert
+            Assert.IsType<ForbidResult>(result);
+        }
+
+        [Fact]
+        public void UpdateEvent_WithValidData_ReturnsOkResult_AndUpdatesDatabase()
+        {
+            // Arrange
+            var db = GetDbContext();
+            var controller = CreateController(db, 1);
+
+            var organiser = new EventOrganiser { OrganiserID = 1, UserID = 1, User = new User() };
+            db.EventOrganisers.Add(organiser);
+
+            var eventToUpdate = new Event
+            {
+                EventID = 1,
+                OrganiserID = 1,
+                EventName = "Old Name",
+                Location = "Old Location",
+                EventDate = DateTime.Now,
+                Distance = 5.0m,
+                EventType = "Walk",
+                CreatedDate = DateTime.Now
+            };
+            db.Events.Add(eventToUpdate);
+            db.SaveChanges();
+
+            var updateDto = new AddEventDto
+            {
+                EventName = "Updated Name",
+                Description = "Updated Description",
+                Location = "Updated Location",
+                EventDate = DateTime.Now.AddDays(10),
+                Distance = 10.0m,
+                EventType = "Run"
+            };
+
+            // Act
+            var result = controller.UpdateEvent(1, updateDto);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var updatedEvent = Assert.IsType<Event>(okResult.Value);
+            Assert.Equal("Updated Name", updatedEvent.EventName);
+            Assert.Equal("Updated Location", updatedEvent.Location);
+
+            // Verify updated in database
+            var eventFromDb = db.Events.FirstOrDefault(e => e.EventID == 1);
+            Assert.NotNull(eventFromDb);
+            Assert.Equal("Updated Name", eventFromDb.EventName);
+            Assert.Equal("Updated Location", eventFromDb.Location);
+        }
+
+        [Fact]
+        public void UpdateEvent_WithInvalidId_ReturnsNotFound()
+        {
+            // Arrange
+            var db = GetDbContext();
+            var controller = CreateController(db, 1);
+
+            var updateDto = new AddEventDto
+            {
+                EventName = "Updated Name",
+                Location = "Location",
+                EventDate = DateTime.Now,
+                Distance = 10.0m,
+                EventType = "Run"
+            };
+
+            // Act
+            var result = controller.UpdateEvent(999, updateDto);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public void UpdateEvent_ByDifferentOrganiser_ReturnsForbid()
+        {
+            // Arrange
+            var db = GetDbContext();
+            var controller = CreateController(db, 2); // User ID 2
+
+            var organiser1 = new EventOrganiser { OrganiserID = 1, UserID = 1, User = new User() };
+            var organiser2 = new EventOrganiser { OrganiserID = 2, UserID = 2, User = new User() };
+            db.EventOrganisers.AddRange(organiser1, organiser2);
+
+            var eventByOrganiser1 = new Event
+            {
+                EventID = 1,
+                OrganiserID = 1,
+                EventName = "Event by Organiser 1",
+                Location = "Location",
+                EventDate = DateTime.Now,
+                Distance = 5.0m,
+                EventType = "Walk",
+                CreatedDate = DateTime.Now
+            };
+            db.Events.Add(eventByOrganiser1);
+            db.SaveChanges();
+
+            var updateDto = new AddEventDto
+            {
+                EventName = "Updated Name",
+                Location = "Location",
+                EventDate = DateTime.Now,
+                Distance = 10.0m,
+                EventType = "Run"
+            };
+
+            // Act
+            var result = controller.UpdateEvent(1, updateDto);
+
+            // Assert
+            Assert.IsType<ForbidResult>(result);
+        }
+
+        [Fact]
+        public void DeleteEvent_WithValidId_ReturnsOkResult_AndRemovesFromDatabase()
+        {
+            // Arrange
+            var db = GetDbContext();
+            var controller = CreateController(db, 1);
+
+            var organiser = new EventOrganiser { OrganiserID = 1, UserID = 1, User = new User() };
+            db.EventOrganisers.Add(organiser);
+
+            var eventToDelete = new Event
+            {
+                EventID = 1,
+                OrganiserID = 1,
+                EventName = "Event to Delete",
+                Location = "Location",
+                EventDate = DateTime.Now,
+                Distance = 5.0m,
+                EventType = "Walk",
+                CreatedDate = DateTime.Now
+            };
+            db.Events.Add(eventToDelete);
+            db.SaveChanges();
+
+            // Act
+            var result = controller.DeleteEvent(1);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var message = okResult.Value;
+            Assert.NotNull(message);
+
+            // Verify deleted from database
+            var eventFromDb = db.Events.FirstOrDefault(e => e.EventID == 1);
+            Assert.Null(eventFromDb);
+        }
+
+        [Fact]
+        public void DeleteEvent_WithInvalidId_ReturnsNotFound()
+        {
+            // Arrange
+            var db = GetDbContext();
+            var controller = CreateController(db, 1);
+
+            // Act
+            var result = controller.DeleteEvent(999);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public void DeleteEvent_ByDifferentOrganiser_ReturnsForbid()
+        {
+            // Arrange
+            var db = GetDbContext();
+            var controller = CreateController(db, 2); // User ID 2
+
+            var organiser1 = new EventOrganiser { OrganiserID = 1, UserID = 1, User = new User() };
+            var organiser2 = new EventOrganiser { OrganiserID = 2, UserID = 2, User = new User() };
+            db.EventOrganisers.AddRange(organiser1, organiser2);
+
+            var eventByOrganiser1 = new Event
+            {
+                EventID = 1,
+                OrganiserID = 1,
+                EventName = "Event by Organiser 1",
+                Location = "Location",
+                EventDate = DateTime.Now,
+                Distance = 5.0m,
+                EventType = "Walk",
+                CreatedDate = DateTime.Now
+            };
+            db.Events.Add(eventByOrganiser1);
+            db.SaveChanges();
+
+            // Act
+            var result = controller.DeleteEvent(1);
+
+            // Assert
+            Assert.IsType<ForbidResult>(result);
+        }
+    }
+}

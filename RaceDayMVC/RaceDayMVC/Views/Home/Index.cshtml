@@ -1,0 +1,46 @@
+﻿@model List<RaceDayMVC.Models.DTOs.EventSummaryDto>
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center mb-5">
+    <h1 class="display-4 fw-bold text-primary">Welcome to the RaceDay Website</h1>
+    <p class="lead">Find your next challenge.</p>
+</div>
+
+<div class="row mt-4">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var ev in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm h-100 border-0">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold text-dark">@ev.EventName</h5>
+                        <h6 class="card-subtitle mb-3 text-muted">📍 @ev.Location</h6>
+
+                        <p class="card-text">
+                            <strong>Date:</strong> @ev.EventDate.ToString("dd MMM yyyy") <br />
+                            <strong>Distance:</strong> @ev.Distance km <br />
+                            <strong>Type:</strong> <span class="badge bg-success">@ev.EventType</span>
+                        </p>
+                    </div>
+                    <div class="card-footer bg-white border-0 pb-3">
+                        <a>asp-controller="Events" asp-action="Details" asp-route-id="@ev.EventID" class </a> 
+                        <button class="btn btn-outline-primary w-100">View Details</button>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12 text-center mt-5">
+            <div class="alert alert-info shadow-sm">
+                <h4>No events found.</h4>
+                <p class="mb-0">Register/Login to find the events🧚.</p>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,39 @@
+﻿@model List<RaceDayMVC.Models.DTOs.ResultDto>
+@{
+    ViewData["Title"] = "My Results";
+}
+
+<h2 class="fw-bold mb-4">My Race History</h2>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        @if (Model.Any())
+        {
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="ps-4">Event</th>
+                        <th>Date</th>
+                        <th>Finish Time</th>
+                        <th>Position</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var res in Model)
+                    {
+                        <tr>
+                            <td class="ps-4 fw-bold">@res.EventName</td>
+                            <td>@res.DateOfResults.ToString("dd MMM yyyy")</td>
+                            <td class="fw-bold text-success">@res.FinishTime.ToString(@"hh\:mm\:ss")</td>
+                            <td><span class="badge bg-primary fs-6">@res.Position</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="alert alert-info m-4">No results recorded yet. Check back after your events conclude!</div>
+        }
+    </div>
+</div>

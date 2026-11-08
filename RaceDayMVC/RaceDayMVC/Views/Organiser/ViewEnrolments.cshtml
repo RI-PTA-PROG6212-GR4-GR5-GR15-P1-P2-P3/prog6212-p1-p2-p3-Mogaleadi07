@@ -1,0 +1,43 @@
+﻿@model List<RaceDayMVC.Models.DTOs.EnrolmentDto>
+@{
+    ViewData["Title"] = "View Enrolments";
+}
+
+<h2 class="fw-bold mb-4">Enrolments</h2>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        @if (Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="ps-4">Participant</th>
+                        <th>Category</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <!-- Displaying Participant ID for now, we can add names later -->
+                            <td class="ps-4 fw-bold">Participant #@item.ParticipantID</td>
+                            <td>@item.CategoryName</td>
+                            <td>@item.EnrolmentDate.ToString("dd MMM yyyy")</td>
+                            <td><span class="badge bg-success">@item.Status</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="alert alert-info m-3">No one has enrolled in this event yet.</div>
+        }
+    </div>
+</div>
+<div class="mt-3">
+    <a asp-action="Dashboard" class="btn btn-outline-secondary">Back to Dashboard</a>
+</div>
