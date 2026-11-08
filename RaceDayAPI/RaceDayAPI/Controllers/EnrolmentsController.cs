@@ -66,7 +66,7 @@ namespace RaceDayAPI.Controllers
             // Project into the DTO to flatten the data
             var enrolments = _db.EventEnrolments
                 .Where(e => e.ParticipantID == participant.ParticipantID)
-                .Select(e => new EventEnrolment
+                .Select(e => new EnrolmentDto
                 {
                     EnrolmentID = e.EnrolmentID,
                     EventID = e.EventID,

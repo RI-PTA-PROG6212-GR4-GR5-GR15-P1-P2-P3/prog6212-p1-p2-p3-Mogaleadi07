@@ -20,5 +20,6 @@ namespace RaceDayAPI.Models
         public EventRoute? Route { get; set; }
         public ICollection<EventCategory> Categories { get; set; } = new List<EventCategory>();
         public ICollection<EventEnrolment> Enrolments { get; set; } = new List<EventEnrolment>();
+        public string? BannerUrl { get; set; }
     }
 }

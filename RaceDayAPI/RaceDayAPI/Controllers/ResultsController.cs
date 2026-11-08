@@ -60,12 +60,14 @@ namespace RaceDayAPI.Controllers
             if (participant is null) return Forbid();
 
             // Project into the DTO
+            // Project into the DTO
             var results = _db.Results
-                .Where(r => r.Enrolment.ParticipantID == participant.ParticipantID)
-                .Select(r => new Result
+                .Where(r => r.Enrolment!.ParticipantID == participant.ParticipantID)
+                .Select(r => new ResultDto
                 {
                     ResultID = r.ResultID,
-                    EventName = r.Enrolment.Event.EventName,
+                    EnrolmentID = r.EnrolmentID,
+                    EventName = r.Enrolment!.Event!.EventName,       // <--- Added ! here
                     FinishTime = r.FinishTime,
                     Position = r.Position,
                     DateOfResults = r.DateOfResults
@@ -75,8 +77,8 @@ namespace RaceDayAPI.Controllers
             return Ok(results);
         }
 
-        // GET: /api/results/event/{eventId}  (Organiser only)
-        [Authorize(Roles = "Organiser")]
+            // GET: /api/results/event/{eventId}  (Organiser only)
+            [Authorize(Roles = "Organiser")]
         [HttpGet("event/{eventId}")]
         public IActionResult ResultsForEvent(int eventId)
         {
