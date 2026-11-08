@@ -63,5 +63,10 @@ namespace RaceDayMVC.Services
             var client = CreateClient();
             return await client.DeleteAsync(endpoint);
         }
+        public async Task<HttpResponseMessage> PostFormDataAsync(string endpoint, MultipartFormDataContent content)
+        {
+            var client = CreateClient();
+            return await client.PostAsync(endpoint, content);
+        }
     }
 }

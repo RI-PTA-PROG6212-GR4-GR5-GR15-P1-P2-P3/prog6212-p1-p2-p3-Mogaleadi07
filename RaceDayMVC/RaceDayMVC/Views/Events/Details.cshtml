@@ -6,6 +6,10 @@
 <div class="row mt-4">
     <div class="col-md-8">
         <h1 class="fw-bold text-primary">@Model.EventName</h1>
+        @if (!string.IsNullOrEmpty(Model.BannerUrl))
+        {
+            <img src="@Model.BannerUrl" class="img-fluid rounded mb-3 shadow-sm w-100" style="max-height: 400px; object-fit: cover;" alt="Event Banner" />
+        }
         <h5 class="text-muted">📍 @Model.Location</h5>
         <hr />
         <p>@Model.Description</p>

@@ -15,6 +15,7 @@ namespace RaceDayMVC.Models.DTOs
             public string EventType { get; set; } = string.Empty;
             public string OrganiserName { get; set; } = string.Empty;
             public int TotalEnrolments { get; set; }
+            public string? BannerUrl { get; set; }
 
     }
 
@@ -32,9 +33,10 @@ namespace RaceDayMVC.Models.DTOs
             public int OrganiserID { get; set; }
             public string OrganiserName { get; set; } = string.Empty;
             public int TotalEnrolments { get; set; }
+            public string? BannerUrl { get; set; }
 
-            // We will add Route and Categories later if needed
-            public List<CategoryDto> Categories { get; set; } = new();
+        // We will add Route and Categories later if needed
+        public List<CategoryDto> Categories { get; set; } = new();
         }
 
         // Helper DTO for categories

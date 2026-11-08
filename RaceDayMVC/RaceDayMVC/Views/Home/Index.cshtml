@@ -16,6 +16,11 @@
         {
             <div class="col-md-4 mb-4">
                 <div class="card shadow-sm h-100 border-0">
+                    <!-- THIS IS PERFECT -->
+                    @if (!string.IsNullOrEmpty(ev.BannerUrl))
+                    {
+                        <img src="@ev.BannerUrl" class="card-img-top" alt="Event Banner" style="height: 200px; object-fit: cover;">
+                    }
                     <div class="card-body">
                         <h5 class="card-title fw-bold text-dark">@ev.EventName</h5>
                         <h6 class="card-subtitle mb-3 text-muted">📍 @ev.Location</h6>
@@ -27,8 +32,10 @@
                         </p>
                     </div>
                     <div class="card-footer bg-white border-0 pb-3">
-                        <a>asp-controller="Events" asp-action="Details" asp-route-id="@ev.EventID" class </a> 
-                        <button class="btn btn-outline-primary w-100">View Details</button>
+                        <!-- FIXED BUTTON HERE -->
+                        <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.EventID" class="btn btn-outline-primary w-100 fw-bold">
+                            View Details
+                        </a>
                     </div>
                 </div>
             </div>
