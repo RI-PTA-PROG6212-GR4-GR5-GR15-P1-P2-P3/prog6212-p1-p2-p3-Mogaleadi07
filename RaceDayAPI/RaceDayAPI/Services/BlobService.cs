@@ -31,7 +31,7 @@ namespace RaceDayAPI.Services
             using var stream = file.OpenReadStream();
             await blobClient.UploadAsync(stream, true);
 
-            return blobClient.Uri.ToString();
+            return blobClient.Uri.ToString().Replace("azurite", "localhost");
         }
     }
 }
