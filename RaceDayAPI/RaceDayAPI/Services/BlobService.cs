@@ -1,4 +1,5 @@
 ﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 
 namespace RaceDayAPI.Services
 {
@@ -19,8 +20,11 @@ namespace RaceDayAPI.Services
             var blobServiceClient = new BlobServiceClient(_connectionString);
             var blobContainerClient = blobServiceClient.GetBlobContainerClient(_containerName);
 
-            // Create the container if it doesn't exist
+            // 1. Create if it doesn't exist
             await blobContainerClient.CreateIfNotExistsAsync();
+
+            // 2. FORCE the container to be public (this fixes the old private container!)
+            await blobContainerClient.SetAccessPolicyAsync(PublicAccessType.Blob);
 
             var blobClient = blobContainerClient.GetBlobClient(Guid.NewGuid().ToString() + Path.GetExtension(file.FileName));
 

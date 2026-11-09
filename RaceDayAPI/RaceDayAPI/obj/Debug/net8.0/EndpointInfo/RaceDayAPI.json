@@ -177,17 +177,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/EnrolmentDto"
+                "$ref": "#/components/schemas/CreateEnrolmentDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/EnrolmentDto"
+                "$ref": "#/components/schemas/CreateEnrolmentDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/EnrolmentDto"
+                "$ref": "#/components/schemas/CreateEnrolmentDto"
               }
             }
           }
@@ -578,44 +578,16 @@
         },
         "additionalProperties": false
       },
-      "EnrolmentDto": {
+      "CreateEnrolmentDto": {
         "type": "object",
         "properties": {
           "eventID": {
             "type": "integer",
             "format": "int32"
           },
-          "enrolmentID": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "participantID": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "participantName": {
-            "type": "string",
-            "nullable": true
-          },
-          "eventName": {
-            "type": "string",
-            "nullable": true
-          },
           "categoryID": {
             "type": "integer",
             "format": "int32"
-          },
-          "categoryName": {
-            "type": "string",
-            "nullable": true
-          },
-          "enrolmentDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "status": {
-            "type": "string",
-            "nullable": true
           }
         },
         "additionalProperties": false

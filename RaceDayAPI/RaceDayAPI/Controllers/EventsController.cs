@@ -122,6 +122,8 @@ namespace RaceDayAPI.Controllers
 
             // Upload image if provided
             string bannerUrl = string.Empty;
+            bool imageWasReceived = false;
+            string fileName = "None";
             if (image != null && image.Length > 0)
             {
                 bannerUrl = await _blobService.UploadFileAsync(image);
@@ -142,7 +144,11 @@ namespace RaceDayAPI.Controllers
             _db.Events.Add(ev);
             _db.SaveChanges();
 
-            return Ok(new { message = "Event created successfully", eventId = ev.EventID });
+            return Ok(new
+            {
+                message = "Event created successfully",
+                eventId = ev.EventID           // Did Azurite give us a URL?
+            });
         }
 
         // PUT: /api/events/{id}  (Organiser only)

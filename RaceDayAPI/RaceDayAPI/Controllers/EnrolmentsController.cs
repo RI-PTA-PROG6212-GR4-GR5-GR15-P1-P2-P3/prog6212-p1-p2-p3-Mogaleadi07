@@ -22,10 +22,9 @@ namespace RaceDayAPI.Controllers
         // POST: /api/enrolments  (Participant only)
         [Authorize(Roles = "Participant")]
         [HttpPost]
-        public IActionResult Enrol(EnrolmentDto dto)
+        public IActionResult Enrol(CreateEnrolmentDto dto)
         {
-            var participant = _db.Participants
-                .FirstOrDefault(p => p.UserID == CurrentUserId);
+            var participant = _db.Participants.FirstOrDefault(p => p.UserID == CurrentUserId);
             if (participant is null) return Forbid();
 
             var ev = _db.Events.Find(dto.EventID);
@@ -51,7 +50,8 @@ namespace RaceDayAPI.Controllers
             };
             _db.EventEnrolments.Add(enrolment);
             _db.SaveChanges();
-            return Ok(enrolment);
+
+            return Ok(new { message = "Successfully enrolled." });
         }
 
         // GET: /api/enrolments/my  (Participant only)
