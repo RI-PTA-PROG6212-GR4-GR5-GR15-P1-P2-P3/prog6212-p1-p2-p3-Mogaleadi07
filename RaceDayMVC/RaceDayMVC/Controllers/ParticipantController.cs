@@ -20,10 +20,7 @@ namespace RaceDayMVC.Controllers
             if (HttpContext.Session.GetString("UserRole") != "Participant")
                 return RedirectToAction("Login", "Account");
 
-            // Create the payload matching your API's EnrolmentDto
             var dto = new { EventID = eventId, CategoryID = categoryId };
-
-            // Send the POST request to the API
             var response = await _api.PostAsync("api/enrolments", dto);
 
             if (response.IsSuccessStatusCode)
@@ -32,7 +29,10 @@ namespace RaceDayMVC.Controllers
                 return RedirectToAction("MyEnrolments");
             }
 
-            TempData["Error"] = "Failed to enrol. You might already be enrolled in this category.";
+            // --- READ THE REAL ERROR FROM THE API ---
+            var errorMsg = await response.Content.ReadAsStringAsync();
+            TempData["Error"] = $"API Error ({(int)response.StatusCode}): {errorMsg}";
+
             return RedirectToAction("Details", "Events", new { id = eventId });
         }
 

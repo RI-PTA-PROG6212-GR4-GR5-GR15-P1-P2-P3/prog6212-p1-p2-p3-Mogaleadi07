@@ -35,33 +35,30 @@ namespace RaceDayMVC.Controllers
             if (!IsOrganiser()) return RedirectToAction("Login", "Account");
             if (!ModelState.IsValid) return View(dto);
 
-            // Build the multipart form data
             var content = new MultipartFormDataContent();
             content.Add(new StringContent(dto.EventName), "EventName");
             content.Add(new StringContent(dto.Description ?? ""), "Description");
             content.Add(new StringContent(dto.Location), "Location");
-
-            // Send date in a safe format for the API
             content.Add(new StringContent(dto.EventDate.ToString("yyyy-MM-ddTHH:mm:ss")), "EventDate");
-
             content.Add(new StringContent(dto.Distance.ToString()), "Distance");
             content.Add(new StringContent(dto.EventType), "EventType");
 
-            // Add the image file if one was uploaded
             if (ImageFile != null && ImageFile.Length > 0)
             {
                 var fileContent = new StreamContent(ImageFile.OpenReadStream());
                 fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(ImageFile.ContentType);
-
-                // "image" must match the parameter name in the API controller!
                 content.Add(fileContent, "image", ImageFile.FileName);
             }
 
             var response = await _api.PostFormDataAsync("api/events", content);
 
-            if (response.IsSuccessStatusCode) return RedirectToAction("Dashboard");
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["Success"] = "Event created successfully!";
+                return RedirectToAction("Dashboard");
+            }
 
-            ModelState.AddModelError("", "Failed to create event.");
+            ModelState.AddModelError("", "Failed to create event. Please check your inputs and try again.");
             return View(dto);
         }
 

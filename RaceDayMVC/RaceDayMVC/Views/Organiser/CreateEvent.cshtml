@@ -8,7 +8,9 @@
         <div class="card shadow-sm border-0 mt-4">
             <div class="card-header bg-primary text-white fw-bold">Create New Event</div>
             <div class="card-body">
-                <form asp-action="CreateEvent" method="post">
+                <div asp-validation-summary="All" class="text-danger fw-bold"></div>
+                <!-- CHANGE 1: Added enctype="multipart/form-data" -->
+                <form asp-action="CreateEvent" method="post" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label class="form-label">Event Name</label>
                         <input asp-for="EventName" class="form-control" required />
@@ -41,6 +43,13 @@
                             </select>
                         </div>
                     </div>
+
+                    <!---> Added the file upload input -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Event Banner Image</label>
+                        <input type="file" name="ImageFile" class="form-control" accept="image/*" />
+                    </div>
+
                     <button type="submit" class="btn btn-primary w-100 fw-bold py-2">Create Event</button>
                 </form>
             </div>
