@@ -251,19 +251,63 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/AddEventDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AddEventDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/AddEventDto"
+                "required": [
+                  "EventName",
+                  "EventType",
+                  "Location"
+                ],
+                "type": "object",
+                "properties": {
+                  "EventName": {
+                    "type": "string"
+                  },
+                  "Description": {
+                    "type": "string"
+                  },
+                  "Location": {
+                    "type": "string"
+                  },
+                  "EventDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "Distance": {
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "EventType": {
+                    "type": "string"
+                  },
+                  "image": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "EventName": {
+                  "style": "form"
+                },
+                "Description": {
+                  "style": "form"
+                },
+                "Location": {
+                  "style": "form"
+                },
+                "EventDate": {
+                  "style": "form"
+                },
+                "Distance": {
+                  "style": "form"
+                },
+                "EventType": {
+                  "style": "form"
+                },
+                "image": {
+                  "style": "form"
+                }
               }
             }
           }
@@ -548,6 +592,10 @@
           "participantID": {
             "type": "integer",
             "format": "int32"
+          },
+          "participantName": {
+            "type": "string",
+            "nullable": true
           },
           "eventName": {
             "type": "string",
