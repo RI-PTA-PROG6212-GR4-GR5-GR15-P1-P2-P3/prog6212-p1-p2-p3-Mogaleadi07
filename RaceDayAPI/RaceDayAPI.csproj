@@ -8,10 +8,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Compile Remove="RaceDayAPI/**/*.cs" />
-		<Content Remove="RaceDayAPI/**/*" />
-		<EmbeddedResource Remove="RaceDayAPI/**/*" />
-		<None Remove="RaceDayAPI/**/*" />
+		<Compile Remove="RaceDayAPI/**/*.cs;RaceDayAPI.Tests/**/*.cs;**/obj/**/*.cs;**/bin/**/*.cs" />
+		<Content Remove="RaceDayAPI/**/*;RaceDayAPI.Tests/**/*" />
+		<EmbeddedResource Remove="RaceDayAPI/**/*;RaceDayAPI.Tests/**/*" />
+		<None Remove="RaceDayAPI/**/*;RaceDayAPI.Tests/**/*" />
 	</ItemGroup>
 
 	<ItemGroup>
