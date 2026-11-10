@@ -264,6 +264,10 @@ CI/CD Pipeline Screenshot Part 1:
 CI/CD Pipeline Screenshot Part 2:
 <img width="706" height="188" alt="RaceDayAPI CI Screenshot" src="https://github.com/user-attachments/assets/95724a55-5fec-4f3f-a75e-24ad2f78c8b5" />
 
+CU/CD Pipeline Screenshot Part 2:
+<img width="635" height="185" alt="image" src="https://github.com/user-attachments/assets/d3fdc65d-7238-4a53-8d94-d7a8b9a12e5e" />
+
+
 
 ---
 ## The Video Walkthrough
@@ -274,6 +278,9 @@ YouTube Link for the unlisted video : https://youtu.be/m_7JQy6tCgQ
 
 Part 2: The Video Walkthrough explains the working ASP.NET Core Web API implementation.
 YouTube Link for the unlisted video: https://youtu.be/MrJm40hASVk
+
+Part 3: The Video Walkthrough explains the MVC implementation, the organiser and participant dashboards and how the raceday website works:
+YouTube Link for the unlisted video: https://youtu.be/EHZhL4nLhCY
 
 
 
