@@ -2,9 +2,9 @@ name: .NET build and test
 
 on:
   push:
-
-permissions:
-  contents: read
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
 
 jobs:
   build-and-test:
@@ -18,18 +18,11 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Build all .NET projects
-        shell: bash
-        run: |
-          find . -type f -name '*.csproj' -not -path '*/obj/*' -not -path '*/bin/*' -print0 |
-            while IFS= read -r -d '' project; do
-              dotnet build "$project" --configuration Release
-            done
+      - name: Restore dependencies
+        run: dotnet restore
 
-      - name: Run all unit test projects
-        shell: bash
-        run: |
-          find . -type f -name '*Tests.csproj' -not -path '*/obj/*' -not -path '*/bin/*' -print0 |
-            while IFS= read -r -d '' project; do
-              dotnet test "$project" --configuration Release
-            done
+      - name: Build all projects
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Run unit tests
+        run: dotnet test --no-build --configuration Release --verbosity normal
