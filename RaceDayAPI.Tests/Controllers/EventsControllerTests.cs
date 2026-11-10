@@ -43,16 +43,37 @@ namespace RaceDayAPI.Tests.Controllers
             return controller;
         }
 
+        private EventOrganiser SeedOrganiser(AppDbContext db, int userId = 1)
+        {
+            var user = new User
+            {
+                UserId = userId,
+                UserName = "TestUser",
+                EmailAddress = "test@example.com",
+                ContactNumber = "1234567890",
+                PasswordHash = "hash"
+            };
+
+            var organiser = new EventOrganiser
+            {
+                OrganiserID = 1,
+                UserID = userId,
+                User = user
+            };
+
+            db.Users.Add(user);
+            db.EventOrganisers.Add(organiser);
+            db.SaveChanges();
+            return organiser;
+        }
+
         [Fact]
-        public void PostCreateEvent_ShouldCreateEventInDatabase()
+        public async Task PostCreateEvent_ShouldCreateEventInDatabase()
         {
             // Arrange
             var db = GetDbContext();
             var controller = CreateController(db, 1);
-
-            var organiser = new EventOrganiser { OrganiserID = 1, UserID = 1 };
-            db.EventOrganisers.Add(organiser);
-            db.SaveChanges();
+            SeedOrganiser(db, 1);
 
             var addEventDto = new AddEventDto
             {
@@ -64,12 +85,11 @@ namespace RaceDayAPI.Tests.Controllers
             };
 
             // Act
-            var result = controller.AddEvent(addEventDto, null).Result;
+            var result = await controller.AddEvent(addEventDto, null);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var value = okResult.Value;
-            Assert.NotNull(value);
+            Assert.NotNull(okResult.Value);
             Assert.Equal(1, db.Events.Count());
         }
 
@@ -79,12 +99,11 @@ namespace RaceDayAPI.Tests.Controllers
             // Arrange
             var db = GetDbContext();
             var controller = CreateController(db, 1);
+            var organiser = SeedOrganiser(db, 1);
 
-            var organiser = new EventOrganiser { OrganiserID = 1, UserID = 1 };
-            db.EventOrganisers.Add(organiser);
             db.Events.AddRange(
-                new Event { EventID = 1, OrganiserID = 1, EventName = "Event 1", Location = "Loc1", EventDate = DateTime.Now, Distance = 10m, EventType = "Run", CreatedDate = DateTime.Now },
-                new Event { EventID = 2, OrganiserID = 1, EventName = "Event 2", Location = "Loc2", EventDate = DateTime.Now, Distance = 20m, EventType = "Walk", CreatedDate = DateTime.Now }
+                new Event { OrganiserID = organiser.OrganiserID, Organiser = organiser, EventName = "Event 1", Location = "Loc1", EventDate = DateTime.Now, Distance = 10m, EventType = "Run", CreatedDate = DateTime.Now },
+                new Event { OrganiserID = organiser.OrganiserID, Organiser = organiser, EventName = "Event 2", Location = "Loc2", EventDate = DateTime.Now, Distance = 20m, EventType = "Walk", CreatedDate = DateTime.Now }
             );
             db.SaveChanges();
 
@@ -92,7 +111,8 @@ namespace RaceDayAPI.Tests.Controllers
             var result = controller.GetAll();
 
             // Assert
-            var events = Assert.IsAssignableFrom<IEnumerable<object>>(((OkObjectResult)result).Value);
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var events = Assert.IsAssignableFrom<IEnumerable<object>>(okResult.Value);
             Assert.Equal(2, events.Count());
         }
 
@@ -102,13 +122,18 @@ namespace RaceDayAPI.Tests.Controllers
             // Arrange
             var db = GetDbContext();
             var controller = CreateController(db, 1);
+            var organiser = SeedOrganiser(db, 1);
 
-            var organiser = new EventOrganiser { OrganiserID = 1, UserID = 1 };
-            db.EventOrganisers.Add(organiser);
-            db.Events.Add(new Event 
-            { 
-                EventID = 1, OrganiserID = 1, EventName = "Test Event", Location = "Location",
-                EventDate = DateTime.Now, Distance = 5m, EventType = "Walk", CreatedDate = DateTime.Now 
+            db.Events.Add(new Event
+            {
+                OrganiserID = organiser.OrganiserID,
+                Organiser = organiser,
+                EventName = "Test Event",
+                Location = "Location",
+                EventDate = DateTime.Now,
+                Distance = 5m,
+                EventType = "Walk",
+                CreatedDate = DateTime.Now
             });
             db.SaveChanges();
 
@@ -116,9 +141,8 @@ namespace RaceDayAPI.Tests.Controllers
             var result = controller.GetById(1);
 
             // Assert
-            var ev = Assert.IsType<OkObjectResult>(result);
-            var eventDetail = ev.Value;
-            Assert.NotNull(eventDetail);
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            Assert.NotNull(okResult.Value);
         }
 
         [Fact]
@@ -127,13 +151,18 @@ namespace RaceDayAPI.Tests.Controllers
             // Arrange
             var db = GetDbContext();
             var controller = CreateController(db, 1);
+            var organiser = SeedOrganiser(db, 1);
 
-            var organiser = new EventOrganiser { OrganiserID = 1, UserID = 1 };
-            db.EventOrganisers.Add(organiser);
-            db.Events.Add(new Event 
-            { 
-                EventID = 1, OrganiserID = 1, EventName = "Old Name", Location = "Location",
-                EventDate = DateTime.Now, Distance = 5m, EventType = "Walk", CreatedDate = DateTime.Now 
+            db.Events.Add(new Event
+            {
+                OrganiserID = organiser.OrganiserID,
+                Organiser = organiser,
+                EventName = "Old Name",
+                Location = "Location",
+                EventDate = DateTime.Now,
+                Distance = 5m,
+                EventType = "Walk",
+                CreatedDate = DateTime.Now
             });
             db.SaveChanges();
 
@@ -165,13 +194,18 @@ namespace RaceDayAPI.Tests.Controllers
             // Arrange
             var db = GetDbContext();
             var controller = CreateController(db, 1);
+            var organiser = SeedOrganiser(db, 1);
 
-            var organiser = new EventOrganiser { OrganiserID = 1, UserID = 1 };
-            db.EventOrganisers.Add(organiser);
-            db.Events.Add(new Event 
-            { 
-                EventID = 1, OrganiserID = 1, EventName = "Event to Delete", Location = "Location",
-                EventDate = DateTime.Now, Distance = 5m, EventType = "Walk", CreatedDate = DateTime.Now 
+            db.Events.Add(new Event
+            {
+                OrganiserID = organiser.OrganiserID,
+                Organiser = organiser,
+                EventName = "Event to Delete",
+                Location = "Location",
+                EventDate = DateTime.Now,
+                Distance = 5m,
+                EventType = "Walk",
+                CreatedDate = DateTime.Now
             });
             db.SaveChanges();
 
