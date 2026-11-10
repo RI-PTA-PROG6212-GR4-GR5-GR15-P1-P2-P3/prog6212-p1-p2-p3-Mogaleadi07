@@ -1,9 +1,4 @@
 <Solution>
-<<<<<<< Updated upstream
-  <Project Path="RaceDayAPI/RaceDayAPI.Tests/RaceDayAPI.Tests.csproj" Id="623722f3-3dfc-4b8b-b9b0-aa80d9e8592f" />
-  <Project Path="RaceDayAPI/RaceDayAPI/RaceDayAPI.csproj" />
-=======
   <Project Path="RaceDayAPI.Tests/RaceDayAPI.Tests.csproj" Id="623722f3-3dfc-4b8b-b9b0-aa80d9e8592f" />
   <Project Path="RaceDayAPI/RaceDayAPI.csproj" />
->>>>>>> Stashed changes
 </Solution>
