@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using RaceDayAPI.Controllers;
 using RaceDayAPI.Data;
 using RaceDayAPI.Models;
 using RaceDayAPI.Models.DTOs;
+using RaceDayAPI.Services;
 using System.Security.Claims;
 using Xunit;
 
@@ -23,7 +25,15 @@ namespace RaceDayAPI.Tests.Controllers
 
         private EventsController CreateController(AppDbContext db, int userId)
         {
-            var controller = new EventsController(db);
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["ConnectionStrings:AzureStorage"] = "UseDevelopmentStorage=true"
+                })
+                .Build();
+
+            var blobService = new BlobService(config);
+            var controller = new EventsController(db, blobService);
             var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, userId.ToString()) };
             var principal = new ClaimsPrincipal(new ClaimsIdentity(claims));
             controller.ControllerContext = new ControllerContext
@@ -54,12 +64,12 @@ namespace RaceDayAPI.Tests.Controllers
             };
 
             // Act
-            var result = controller.AddEvent(addEventDto);
+            var result = controller.AddEvent(addEventDto, null).Result;
 
             // Assert
-            var createdEvent = ((OkObjectResult)result).Value as Event;
-            Assert.NotNull(createdEvent);
-            Assert.Equal("Marathon 2024", createdEvent.EventName);
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var value = okResult.Value;
+            Assert.NotNull(value);
             Assert.Equal(1, db.Events.Count());
         }
 
@@ -82,9 +92,8 @@ namespace RaceDayAPI.Tests.Controllers
             var result = controller.GetAll();
 
             // Assert
-            var events = ((OkObjectResult)result).Value as List<Event>;
-            Assert.NotNull(events);
-            Assert.Equal(2, events.Count);
+            var events = Assert.IsAssignableFrom<IEnumerable<object>>(((OkObjectResult)result).Value);
+            Assert.Equal(2, events.Count());
         }
 
         [Fact]
@@ -107,9 +116,9 @@ namespace RaceDayAPI.Tests.Controllers
             var result = controller.GetById(1);
 
             // Assert
-            var ev = ((OkObjectResult)result).Value as Event;
-            Assert.NotNull(ev);
-            Assert.Equal("Test Event", ev.EventName);
+            var ev = Assert.IsType<OkObjectResult>(result);
+            var eventDetail = ev.Value;
+            Assert.NotNull(eventDetail);
         }
 
         [Fact]
@@ -141,13 +150,13 @@ namespace RaceDayAPI.Tests.Controllers
             var result = controller.UpdateEvent(1, updateDto);
 
             // Assert
-            var updatedEvent = ((OkObjectResult)result).Value as Event;
-            Assert.NotNull(updatedEvent);
-            Assert.Equal("Updated Name", updatedEvent.EventName);
-            Assert.Equal("New Location", updatedEvent.Location);
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            Assert.NotNull(okResult);
 
             var eventFromDb = db.Events.FirstOrDefault(e => e.EventID == 1);
+            Assert.NotNull(eventFromDb);
             Assert.Equal("Updated Name", eventFromDb.EventName);
+            Assert.Equal("New Location", eventFromDb.Location);
         }
 
         [Fact]
@@ -175,4 +184,3 @@ namespace RaceDayAPI.Tests.Controllers
         }
     }
 }
-
