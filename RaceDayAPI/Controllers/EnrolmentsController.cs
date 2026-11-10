@@ -22,10 +22,9 @@ namespace RaceDayAPI.Controllers
         // POST: /api/enrolments  (Participant only)
         [Authorize(Roles = "Participant")]
         [HttpPost]
-        public IActionResult Enrol(EnrolmentDto dto)
+        public IActionResult Enrol(CreateEnrolmentDto dto)
         {
-            var participant = _db.Participants
-                .FirstOrDefault(p => p.UserID == CurrentUserId);
+            var participant = _db.Participants.FirstOrDefault(p => p.UserID == CurrentUserId);
             if (participant is null) return Forbid();
 
             var ev = _db.Events.Find(dto.EventID);
@@ -51,7 +50,8 @@ namespace RaceDayAPI.Controllers
             };
             _db.EventEnrolments.Add(enrolment);
             _db.SaveChanges();
-            return Ok(enrolment);
+
+            return Ok(new { message = "Successfully enrolled." });
         }
 
         // GET: /api/enrolments/my  (Participant only)
@@ -60,14 +60,24 @@ namespace RaceDayAPI.Controllers
         public IActionResult MyEnrolments()
         {
             var participant = _db.Participants
-                .FirstOrDefault(p => p.UserID == CurrentUserId);
+       .FirstOrDefault(p => p.UserID == CurrentUserId);
             if (participant is null) return Forbid();
 
+            // Project into the DTO to flatten the data
             var enrolments = _db.EventEnrolments
                 .Where(e => e.ParticipantID == participant.ParticipantID)
-                .Include(e => e.Event)
-                .Include(e => e.Category)
+                .Select(e => new EnrolmentDto
+                {
+                    EnrolmentID = e.EnrolmentID,
+                    EventID = e.EventID,
+                    EventName = e.Event.EventName,
+                    CategoryID = e.CategoryID,
+                    CategoryName = e.Category.CategoryName,
+                    EnrolmentDate = e.EnrolmentDate,
+                    Status = e.Status
+                })
                 .ToList();
+
             return Ok(enrolments);
         }
 
@@ -76,19 +86,20 @@ namespace RaceDayAPI.Controllers
         [HttpGet("event/{eventId}")]
         public IActionResult EnrolmentsForEvent(int eventId)
         {
-            var organiser = _db.EventOrganisers
-                .FirstOrDefault(o => o.UserID == CurrentUserId);
-            if (organiser is null) return Forbid();
-
-            var ev = _db.Events.Find(eventId);
-            if (ev is null) return NotFound();
-            if (ev.OrganiserID != organiser.OrganiserID) return Forbid();
-
             var enrolments = _db.EventEnrolments
-                .Where(e => e.EventID == eventId)
-                .Include(e => e.Participant).ThenInclude(p => p!.User)
-                .Include(e => e.Category)
-                .ToList();
+                    .Where(e => e.EventID == eventId)
+                    .Select(e => new EnrolmentDto
+                    {
+                        EnrolmentID = e.EnrolmentID,
+                        EventID = e.EventID,
+                        EventName = e.Event.EventName,
+                        ParticipantID = e.ParticipantID,
+                        // the participant's name!
+                        CategoryName = e.Category.CategoryName,
+                        EnrolmentDate = e.EnrolmentDate,
+                        Status = e.Status
+                    }).ToList();
+
             return Ok(enrolments);
         }
     }

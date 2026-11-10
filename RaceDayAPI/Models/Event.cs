@@ -14,11 +14,12 @@ namespace RaceDayAPI.Models
         public DateTime EventDate { get; set; }
         public decimal Distance { get; set; }
         public string EventType { get; set; } = string.Empty;  // Walk | Run | Cycle
-        public DateTime CreatedDate { get; set; }
 
+        public DateTime CreatedDate { get; set; }
         public EventOrganiser Organiser { get; set; } = null!;
         public EventRoute? Route { get; set; }
         public ICollection<EventCategory> Categories { get; set; } = new List<EventCategory>();
         public ICollection<EventEnrolment> Enrolments { get; set; } = new List<EventEnrolment>();
+        public string? BannerUrl { get; set; }
     }
 }

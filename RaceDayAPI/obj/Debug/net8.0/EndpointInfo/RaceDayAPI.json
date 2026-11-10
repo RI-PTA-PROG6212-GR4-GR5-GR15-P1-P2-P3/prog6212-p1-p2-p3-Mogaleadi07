@@ -114,27 +114,30 @@
               "type": "integer",
               "format": "int32"
             }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AddCategoryDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AddCategoryDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/AddCategoryDto"
-              }
+          },
+          {
+            "name": "CategoryName",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "AgeGroup",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "DistanceType",
+            "in": "query",
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -174,17 +177,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/EnrolmentDto"
+                "$ref": "#/components/schemas/CreateEnrolmentDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/EnrolmentDto"
+                "$ref": "#/components/schemas/CreateEnrolmentDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/EnrolmentDto"
+                "$ref": "#/components/schemas/CreateEnrolmentDto"
               }
             }
           }
@@ -248,23 +251,79 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/AddEventDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AddEventDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/AddEventDto"
+                "required": [
+                  "EventName",
+                  "EventType",
+                  "Location"
+                ],
+                "type": "object",
+                "properties": {
+                  "EventName": {
+                    "type": "string"
+                  },
+                  "Description": {
+                    "type": "string"
+                  },
+                  "Location": {
+                    "type": "string"
+                  },
+                  "EventDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "Distance": {
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "EventType": {
+                    "type": "string"
+                  },
+                  "image": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "EventName": {
+                  "style": "form"
+                },
+                "Description": {
+                  "style": "form"
+                },
+                "Location": {
+                  "style": "form"
+                },
+                "EventDate": {
+                  "style": "form"
+                },
+                "Distance": {
+                  "style": "form"
+                },
+                "EventType": {
+                  "style": "form"
+                },
+                "image": {
+                  "style": "form"
+                }
               }
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Events/organiser": {
+      "get": {
+        "tags": [
+          "Events"
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -466,27 +525,6 @@
   },
   "components": {
     "schemas": {
-      "AddCategoryDto": {
-        "required": [
-          "categoryName"
-        ],
-        "type": "object",
-        "properties": {
-          "categoryName": {
-            "type": "string",
-            "nullable": true
-          },
-          "ageGroup": {
-            "type": "string",
-            "nullable": true
-          },
-          "distanceType": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "AddEventDto": {
         "required": [
           "eventName",
@@ -540,7 +578,7 @@
         },
         "additionalProperties": false
       },
-      "EnrolmentDto": {
+      "CreateEnrolmentDto": {
         "type": "object",
         "properties": {
           "eventID": {

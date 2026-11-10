@@ -58,29 +58,26 @@ namespace RaceDayAPI.Controllers
             [HttpPost("login")]
             public IActionResult Login(LoginDto dto)
             {
-                var user = _db.Users
-                    .Include(u => u.EventOrganiser)
-                    .Include(u => u.Participant)
-                    .FirstOrDefault(u => u.EmailAddress == dto.EmailAddress);
+            var user = _db.Users.FirstOrDefault(u => u.EmailAddress == dto.EmailAddress);
 
-                if (user is null)
-                    return Unauthorized("Invalid credentials.");
+            if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
+                return Unauthorized(new { message = "Invalid email or password." });
 
-                if (!PasswordService.Verify(dto.Password, user.PasswordHash))
-                    return Unauthorized("Invalid credentials.");
+            // Determine Role
+            var isOrganiser = _db.EventOrganisers.Any(o => o.UserID == user.UserId);
+            var role = isOrganiser ? "Organiser" : "Participant";
 
-                string role = user.EventOrganiser != null ? "Organiser" : "Participant";
+            // FIX: Use _jwt and get the tuple
+            var (token, expiresAt) = _jwt.GenerateToken(user, role);
 
-                var (token, expiresAt) = _jwt.GenerateToken(user, role);
-
-                return Ok(new AuthResponseDto
-                {
-                    Token = token,
-                    UserId = user.UserId,
-                    UserName = user.UserName,
-                    Role = role,
-                    ExpiresAt = expiresAt
-                });
+            return Ok(new
+            {
+                user.UserId,
+                user.UserName,
+                user.EmailAddress,
+                Role = role,
+                Token = token
+            });
             }
 
             // GET: /api/auth/me  (protected)

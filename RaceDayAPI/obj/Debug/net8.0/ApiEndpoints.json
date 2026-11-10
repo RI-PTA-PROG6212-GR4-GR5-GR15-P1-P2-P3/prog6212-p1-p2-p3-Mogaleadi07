@@ -87,9 +87,19 @@
         "IsRequired": true
       },
       {
-        "Name": "dto",
-        "Type": "RaceDayAPI.Models.DTOs.AddCategoryDto",
-        "IsRequired": true
+        "Name": "CategoryName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "AgeGroup",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "DistanceType",
+        "Type": "System.String",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": []
@@ -104,7 +114,7 @@
     "Parameters": [
       {
         "Name": "dto",
-        "Type": "RaceDayAPI.Models.DTOs.EnrolmentDto",
+        "Type": "RaceDayAPI.Models.DTOs.CreateEnrolmentDto",
         "IsRequired": true
       }
     ],
@@ -155,9 +165,39 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "dto",
-        "Type": "RaceDayAPI.Models.DTOs.AddEventDto",
-        "IsRequired": true
+        "Name": "EventName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Description",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Location",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "EventDate",
+        "Type": "System.DateTime",
+        "IsRequired": false
+      },
+      {
+        "Name": "Distance",
+        "Type": "System.Decimal",
+        "IsRequired": false
+      },
+      {
+        "Name": "EventType",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "image",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": []
@@ -213,6 +253,16 @@
         "IsRequired": true
       }
     ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "RaceDayAPI.Controllers.EventsController",
+    "Method": "GetOrganiserEvents",
+    "RelativePath": "api/Events/organiser",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
     "ReturnTypes": []
   },
   {

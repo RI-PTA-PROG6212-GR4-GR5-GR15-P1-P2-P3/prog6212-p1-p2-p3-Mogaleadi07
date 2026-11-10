@@ -6,6 +6,7 @@ using RaceDayAPI.Data;
 using RaceDayAPI.Services;
 using System.Text;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Azure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,6 +56,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 builder.Services.AddScoped<JwtTokenService>();
 
+// the line for the azure blob storage service
+builder.Services.AddScoped<RaceDayAPI.Services.BlobService>();
+
 // 5. Authentication with JWT Bearer
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var jwtKey = jwtSection["Key"]!;
@@ -81,6 +85,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddAuthorization();
+
 
 var app = builder.Build();
 

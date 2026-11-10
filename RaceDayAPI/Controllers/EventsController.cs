@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using RaceDayAPI.Data;
 using RaceDayAPI.Models;
 using RaceDayAPI.Models.DTOs;
+using RaceDayAPI.Services; // <-- Required for BlobService
 using System.Security.Claims;
 
 namespace RaceDayAPI.Controllers
@@ -14,7 +15,14 @@ namespace RaceDayAPI.Controllers
     public class EventsController : ControllerBase
     {
         private readonly AppDbContext _db;
-        public EventsController(AppDbContext db) { _db = db; }
+        private readonly BlobService _blobService; // <-- ADDED
+
+        // <-- INJECTED BlobService HERE
+        public EventsController(AppDbContext db, BlobService blobService)
+        {
+            _db = db;
+            _blobService = blobService;
+        }
 
         private int CurrentUserId =>
             int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -24,9 +32,48 @@ namespace RaceDayAPI.Controllers
         public IActionResult GetAll()
         {
             var events = _db.Events
-                .Include(e => e.Categories)
-                .Include(e => e.Route)
+                .Include(e => e.Organiser).ThenInclude(o => o.User)
+                .Select(e => new EventSummaryDto
+                {
+                    EventID = e.EventID,
+                    EventName = e.EventName,
+                    Location = e.Location,
+                    EventDate = e.EventDate,
+                    Distance = e.Distance,
+                    EventType = e.EventType,
+                    OrganiserName = e.Organiser.User.UserName,
+                    BannerUrl = e.BannerUrl // <-- ADDED
+                })
                 .ToList();
+
+            return Ok(events);
+        }
+
+        // GET: /api/events/organiser  (Organiser only)
+        [Authorize(Roles = "Organiser")]
+        [HttpGet("organiser")]
+        public IActionResult GetOrganiserEvents()
+        {
+            var organiser = _db.EventOrganisers.FirstOrDefault(o => o.UserID == CurrentUserId);
+            if (organiser is null) return Forbid();
+
+            var events = _db.Events
+                .Where(e => e.OrganiserID == organiser.OrganiserID)
+                .Include(e => e.Enrolments)
+                .Select(e => new EventSummaryDto
+                {
+                    EventID = e.EventID,
+                    EventName = e.EventName,
+                    Location = e.Location,
+                    EventDate = e.EventDate,
+                    Distance = e.Distance,
+                    EventType = e.EventType,
+                    OrganiserName = e.Organiser.User.UserName,
+                    TotalEnrolments = e.Enrolments.Count,
+                    BannerUrl = e.BannerUrl // <-- ADDED
+                })
+                .ToList();
+
             return Ok(events);
         }
 
@@ -37,7 +84,29 @@ namespace RaceDayAPI.Controllers
             var ev = _db.Events
                 .Include(e => e.Categories)
                 .Include(e => e.Route)
+                .Include(e => e.Organiser).ThenInclude(o => o.User)
+                .Select(e => new EventDetailDto
+                {
+                    EventID = e.EventID,
+                    EventName = e.EventName,
+                    Description = e.Description,
+                    Location = e.Location,
+                    EventDate = e.EventDate,
+                    Distance = e.Distance,
+                    EventType = e.EventType,
+                    OrganiserID = e.OrganiserID,
+                    OrganiserName = e.Organiser.User.UserName,
+                    BannerUrl = e.BannerUrl, // <-- ADDED
+                    Categories = e.Categories.Select(c => new CategoryDto
+                    {
+                        CategoryID = c.CategoryID,
+                        CategoryName = c.CategoryName,
+                        AgeGroup = c.AgeGroup,
+                        DistanceType = c.DistanceType
+                    }).ToList()
+                })
                 .FirstOrDefault(e => e.EventID == id);
+
             if (ev is null) return NotFound();
             return Ok(ev);
         }
@@ -45,11 +114,20 @@ namespace RaceDayAPI.Controllers
         // POST: /api/events  (Organiser only)
         [Authorize(Roles = "Organiser")]
         [HttpPost]
-        public IActionResult AddEvent(AddEventDto dto)
+        public async Task<IActionResult> AddEvent([FromForm] AddEventDto dto, IFormFile? image) // <-- CHANGED TO [FromForm] and IFormFile
         {
             var organiser = _db.EventOrganisers
                 .FirstOrDefault(o => o.UserID == CurrentUserId);
             if (organiser is null) return Forbid();
+
+            // Upload image if provided
+            string bannerUrl = string.Empty;
+            bool imageWasReceived = false;
+            string fileName = "None";
+            if (image != null && image.Length > 0)
+            {
+                bannerUrl = await _blobService.UploadFileAsync(image);
+            }
 
             var ev = new Event
             {
@@ -60,11 +138,17 @@ namespace RaceDayAPI.Controllers
                 EventDate = dto.EventDate,
                 Distance = dto.Distance,
                 EventType = dto.EventType,
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTime.Now,
+                BannerUrl = bannerUrl // <-- ADDED
             };
             _db.Events.Add(ev);
             _db.SaveChanges();
-            return Ok(ev);
+
+            return Ok(new
+            {
+                message = "Event created successfully",
+                eventId = ev.EventID           // Did Azurite give us a URL?
+            });
         }
 
         // PUT: /api/events/{id}  (Organiser only)
@@ -87,7 +171,8 @@ namespace RaceDayAPI.Controllers
             ev.Distance = dto.Distance;
             ev.EventType = dto.EventType;
             _db.SaveChanges();
-            return Ok(ev);
+
+            return Ok(new { message = "Event updated successfully" });
         }
 
         // DELETE: /api/events/{id}  (Organiser only)

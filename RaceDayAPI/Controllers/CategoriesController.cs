@@ -32,27 +32,15 @@ namespace RaceDayAPI.Controllers
         // POST: /api/categories/event/{eventId}  (Organiser only)
         [Authorize(Roles = "Organiser")]
         [HttpPost("event/{eventId}")]
-        public IActionResult AddCategory(int eventId, AddCategoryDto dto)
+        public IActionResult AddCategory(int eventId,[FromQuery] AddCategoryDto dto)
         {
-            var ev = _db.Events.Find(eventId);
-            if (ev is null) return NotFound("Event not found.");
-
-            var organiser = _db.EventOrganisers
-                .FirstOrDefault(o => o.UserID == CurrentUserId);
-            if (organiser is null || ev.OrganiserID != organiser.OrganiserID)
-                return Forbid();
-
-            if (string.IsNullOrWhiteSpace(dto.AgeGroup) &&
-                string.IsNullOrWhiteSpace(dto.DistanceType))
-                return BadRequest("Provide an age group or a distance type.");
 
             var category = new EventCategory
             {
                 EventID = eventId,
                 CategoryName = dto.CategoryName,
                 AgeGroup = dto.AgeGroup,
-                DistanceType = dto.DistanceType,
-                CreatedDate = DateTime.Now
+                DistanceType = dto.DistanceType
             };
             _db.EventCategories.Add(category);
             _db.SaveChanges();

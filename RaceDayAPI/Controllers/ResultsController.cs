@@ -56,18 +56,29 @@ namespace RaceDayAPI.Controllers
         public IActionResult MyResults()
         {
             var participant = _db.Participants
-                .FirstOrDefault(p => p.UserID == CurrentUserId);
+       .FirstOrDefault(p => p.UserID == CurrentUserId);
             if (participant is null) return Forbid();
 
+            // Project into the DTO
+            // Project into the DTO
             var results = _db.Results
-                .Include(r => r.Enrolment).ThenInclude(e => e!.Event)
                 .Where(r => r.Enrolment!.ParticipantID == participant.ParticipantID)
+                .Select(r => new ResultDto
+                {
+                    ResultID = r.ResultID,
+                    EnrolmentID = r.EnrolmentID,
+                    EventName = r.Enrolment!.Event!.EventName,       // <--- Added ! here
+                    FinishTime = r.FinishTime,
+                    Position = r.Position,
+                    DateOfResults = r.DateOfResults
+                })
                 .ToList();
+
             return Ok(results);
         }
 
-        // GET: /api/results/event/{eventId}  (Organiser only)
-        [Authorize(Roles = "Organiser")]
+            // GET: /api/results/event/{eventId}  (Organiser only)
+            [Authorize(Roles = "Organiser")]
         [HttpGet("event/{eventId}")]
         public IActionResult ResultsForEvent(int eventId)
         {
